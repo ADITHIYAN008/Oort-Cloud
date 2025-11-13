@@ -15,7 +15,7 @@ function createWindow() {
     fullscreen: true,
     frame: false,
     alwaysOnTop: true,
-    kiosk: true, // Prevents Cmd+Tab and Dock access in kiosk mode
+    kiosk: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -37,10 +37,8 @@ function createWindow() {
 
   view.webContents.loadURL("about:blank");
 
-  // Allow dynamic resizing
   mainWindow.on("resize", resizeView);
 
-  // Navigation restriction
   view.webContents.on("will-navigate", (event, url) => {
     if (!isAllowed(url)) {
       event.preventDefault();
@@ -81,7 +79,6 @@ function createWindow() {
 
 function resizeView() {
   const [width, height] = mainWindow.getContentSize();
-  // Reserve top 60px for toolbar
   view.setBounds({ x: 0, y: 60, width, height: height - 60 });
   view.setAutoResize({ width: true, height: true });
 }

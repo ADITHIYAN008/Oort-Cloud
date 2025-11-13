@@ -1,7 +1,5 @@
-# Dependencies
 /node_modules
 
-# Electron-specific ignores (often good practice)
 /release
 /dist
 *.tgz
