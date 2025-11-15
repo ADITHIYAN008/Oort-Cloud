@@ -1,7 +1,6 @@
+// src/main/windows.js
 const { BrowserWindow, BrowserView } = require("electron");
 const path = require("path");
-const { attachToSession } = require("./security/webRequest");
-
 const TOPBAR_HEIGHT = 60;
 
 function createMainWindow() {
@@ -18,35 +17,22 @@ function createMainWindow() {
     },
   });
 
-  mainWindow.loadFile(path.join(__dirname, "../renderer/pages/index.html"));
+  // Load the login page only
+  mainWindow.loadFile(path.join(__dirname, "../renderer/pages/login.html"));
 
+  // Create BrowserView for later but DO NOT attach it yet
   const view = new BrowserView({
     webPreferences: {
       partition: "persist:mainview",
-      contextIsolation: false,
+      preload: path.join(__dirname, "../renderer/preload.js"), // important
+      contextIsolation: true,
       nodeIntegration: false,
+      devTools: false,
     },
   });
 
-  mainWindow.setBrowserView(view);
-
-  const resizeView = () => {
-    const [width, height] = mainWindow.getContentSize();
-    view.setBounds({
-      x: 0,
-      y: TOPBAR_HEIGHT,
-      width,
-      height: height - TOPBAR_HEIGHT,
-    });
-    view.setAutoResize({ width: true, height: true });
-  };
-
-  mainWindow.on("resize", resizeView);
-  mainWindow.on("ready-to-show", resizeView);
-
-  attachToSession(view.webContents.session);
-
-  view.webContents.loadURL("about:blank");
+  // store for later use by ipc
+  mainWindow._examView = view;
 
   return { mainWindow, view };
 }

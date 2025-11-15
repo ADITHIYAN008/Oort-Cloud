@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Dashboard</title>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        margin: 0;
+        background: #111;
+        color: #eee;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      header {
+        background: #222;
+        padding: 15px 20px;
+        font-size: 22px;
+        font-weight: bold;
+        border-bottom: 1px solid #333;
+      }
+
+      .container {
+        padding: 20px;
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .card {
+        background: #1b1b1b;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 0 8px #000a;
+      }
+
+      h2 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #4da3ff;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        background: #333;
+        color: #fff;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+
+      button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        background: #4a8af4;
+        color: #fff;
+        cursor: pointer;
+        font-size: 16px;
+        margin-right: 10px;
+      }
+
+      .danger {
+        background: #f44336;
+      }
+
+      ul {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      li {
+        background: #222;
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .remove-btn {
+        background: #f44336;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        color: #fff;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>Admin Dashboard</header>
+    <div class="container">
+      <div class="card">
+        <h2>Allowed Domains</h2>
+
+        <input id="newDomain" placeholder="Add domain (example.com)" />
+
+        <button id="addDomainBtn">Add Domain</button>
+        <button id="saveBtn">Save Changes</button>
+
+        <ul id="domainList"></ul>
+      </div>
+
+      <!-- EXIT BUTTON ONLY -->
+      <div class="card">
+        <button id="exitBtn" class="danger">Exit</button>
+      </div>
+    </div>
+
+    <script>
+      const listEl = document.getElementById("domainList");
+      const inputEl = document.getElementById("newDomain");
+
+      const addBtn = document.getElementById("addDomainBtn");
+      const saveBtn = document.getElementById("saveBtn");
+      const exitBtn = document.getElementById("exitBtn");
+
+      let whitelist = [];
+
+      // Load whitelist.json
+      async function loadWhitelist() {
+        try {
+          const res = await fetch("../../config/whitelist.json");
+          whitelist = await res.json();
+          renderList();
+        } catch (e) {
+          console.error("Failed to load whitelist", e);
+        }
+      }
+
+      function renderList() {
+        listEl.innerHTML = "";
+        whitelist.forEach((domain, index) => {
+          const li = document.createElement("li");
+          li.textContent = domain;
+
+          const btn = document.createElement("button");
+          btn.className = "remove-btn";
+          btn.textContent = "Remove";
+
+          btn.onclick = () => {
+            whitelist.splice(index, 1);
+            renderList();
+          };
+
+          li.appendChild(btn);
+          listEl.appendChild(li);
+        });
+      }
+
+      addBtn.onclick = () => {
+        const domain = inputEl.value.trim();
+        if (!domain) return;
+
+        whitelist.push(domain);
+        inputEl.value = "";
+        renderList();
+      };
+
+      saveBtn.onclick = async () => {
+        const ok = await window.secureAPI.adminUpdateWhitelist(whitelist);
+        if (ok) alert("Whitelist saved!");
+        else alert("Failed to save whitelist.");
+      };
+
+      exitBtn.onclick = () => {
+        window.secureAPI.emergencyExit();
+      };
+
+      loadWhitelist();
+    </script>
+  </body>
+</html>

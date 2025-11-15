@@ -22,7 +22,7 @@ function getRootDomain(h) {
 }
 
 function attachToSession(sess) {
-  const whitelist = loadWhitelist();
+  let whitelist = loadWhitelist();
 
   console.log("---- ACTIVE WHITELIST ----");
   console.log(whitelist);
@@ -73,10 +73,12 @@ function attachToSession(sess) {
       return callback({ cancel: true });
     }
 
+    // allow same-origin subresources for currentRoot
     if (currentRoot && root === currentRoot) {
       return callback({ cancel: false });
     }
 
+    // otherwise block
     return callback({ cancel: true });
   });
 }
