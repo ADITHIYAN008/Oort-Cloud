@@ -7,6 +7,10 @@ contextBridge.exposeInMainWorld("secureAPI", {
   emergencyExit: () => ipcRenderer.send("emergency-exit"),
   adminUpdateWhitelist: (list) =>
     ipcRenderer.invoke("admin-update-whitelist", list),
+
+  // ⭐ FIXED: put inside secureAPI
+  readWhitelist: () => ipcRenderer.invoke("admin-read-whitelist"),
+
   login: (userid, password) =>
     ipcRenderer.invoke("auth-login", { userid, password }),
 });

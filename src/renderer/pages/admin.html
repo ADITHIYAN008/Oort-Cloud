@@ -1,182 +1,695 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Admin Dashboard</title>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
+    <title>Admin • Secure Exam</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
+      :root {
+        --bg: #0d0d0d;
+        --panel: #141414;
+        --muted: #9aa3ad;
+        --accent: #4a8af4;
+        --danger: #e44d3c;
+        --card: #151515;
+        --glass: rgba(255, 255, 255, 0.03);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
       body {
+        height: 100%;
         margin: 0;
-        background: #111;
-        color: #eee;
-        font-family: sans-serif;
+        background: linear-gradient(180deg, #0b0b0b, #0f0f0f);
+        color: #e6eef6;
+        font-family: Inter, "Segoe UI", system-ui, -apple-system,
+          "Helvetica Neue", Arial;
+      }
+      .app {
+        display: flex;
+        height: 100vh;
+        gap: 20px;
+        padding: 18px;
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        width: 260px;
+        background: var(--panel);
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
         display: flex;
         flex-direction: column;
-        height: 100vh;
+        gap: 16px;
       }
-
-      header {
-        background: #222;
-        padding: 15px 20px;
-        font-size: 22px;
-        font-weight: bold;
-        border-bottom: 1px solid #333;
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
       }
-
-      .container {
-        padding: 20px;
-        flex: 1;
-        overflow-y: auto;
-      }
-
-      .card {
-        background: #1b1b1b;
-        padding: 20px;
+      .logo {
+        width: 44px;
+        height: 44px;
         border-radius: 10px;
-        margin-bottom: 20px;
-        box-shadow: 0 0 8px #000a;
+        background: linear-gradient(135deg, var(--accent), #2f6fd3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(74, 138, 244, 0.12);
+      }
+      .brand h1 {
+        font-size: 16px;
+        margin: 0;
+      }
+      nav {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        border-radius: 8px;
+        color: var(--muted);
+        cursor: pointer;
+        user-select: none;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .nav-item.active {
+        background: linear-gradient(
+          90deg,
+          rgba(74, 138, 244, 0.12),
+          rgba(74, 138, 244, 0.06)
+        );
+        color: var(--accent);
+      }
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .nav-icon {
+        width: 28px;
+        text-align: center;
+        opacity: 0.95;
       }
 
-      h2 {
-        margin-top: 0;
-        margin-bottom: 15px;
-        color: #4da3ff;
+      .sidebar .meta {
+        margin-top: auto;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.03);
+        font-size: 13px;
+        color: var(--muted);
       }
 
-      input {
-        width: 100%;
+      /* MAIN AREA */
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .topbar {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 18px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.01),
+          rgba(255, 255, 255, 0)
+        );
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+      }
+      .topbar .title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #dfe9f7;
+      }
+      .topbar .sub {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+
+      /* Cards */
+      .card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+      }
+
+      /* Whitelist editor layout */
+      .whitelist-header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .domain-input {
+        flex: 1;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      input[type="text"],
+      textarea {
+        background: #0f1112;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        color: #e8eef6;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      .small-btn {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: #fff;
+      }
+
+      ul.domain-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 320px;
+        overflow: auto;
+      }
+      ul.domain-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: var(--card);
+        color: #dfe9f7;
+        font-weight: 600;
+      }
+
+      /* Controls area */
+      .controls-grid {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .controls-grid .input {
+        flex: 1;
+        min-width: 280px;
+      }
+
+      /* Logs */
+      .log-area {
+        background: #0b0b0b;
         padding: 12px;
         border-radius: 8px;
-        border: none;
-        outline: none;
-        background: #333;
-        color: #fff;
-        margin-bottom: 10px;
-        font-size: 16px;
+        font-family: monospace;
+        color: #cbd6df;
+        max-height: 320px;
+        overflow: auto;
+        white-space: pre-wrap;
+        font-size: 13px;
       }
 
-      button {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        background: #4a8af4;
-        color: #fff;
-        cursor: pointer;
-        font-size: 16px;
-        margin-right: 10px;
-      }
-
-      .danger {
-        background: #f44336;
-      }
-
-      ul {
-        list-style: none;
-        padding-left: 0;
-      }
-
-      li {
-        background: #222;
-        padding: 10px;
-        margin-bottom: 8px;
-        border-radius: 6px;
+      /* Settings placeholder */
+      .setting-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        color: var(--muted);
       }
 
-      .remove-btn {
-        background: #f44336;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 5px;
-        cursor: pointer;
-        color: #fff;
-        font-size: 14px;
+      /* footer controls */
+      .footer-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      /* responsive */
+      @media (max-width: 900px) {
+        .app {
+          flex-direction: column;
+          padding: 10px;
+        }
+        .sidebar {
+          width: 100%;
+          flex-direction: row;
+          overflow: auto;
+        }
+        .main {
+          width: 100%;
+        }
       }
     </style>
   </head>
-
   <body>
-    <header>Admin Dashboard</header>
-    <div class="container">
-      <div class="card">
-        <h2>Allowed Domains</h2>
+    <div class="app">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="logo">S</div>
+          <div>
+            <h1 style="margin: 0; font-size: 15px">Secure One-Tab</h1>
+            <div style="font-size: 12px; color: var(--muted)">
+              Admin Console
+            </div>
+          </div>
+        </div>
 
-        <input id="newDomain" placeholder="Add domain (example.com)" />
+        <nav>
+          <div class="nav-item active" data-tab="whitelist">
+            <div class="nav-icon">📜</div>
+            Whitelist
+          </div>
+          <div class="nav-item" data-tab="controls">
+            <div class="nav-icon">⚙️</div>
+            Controls
+          </div>
+          <div class="nav-item" data-tab="logs">
+            <div class="nav-icon">📝</div>
+            Activity Logs
+          </div>
+          <div class="nav-item" data-tab="settings">
+            <div class="nav-icon">🔧</div>
+            Settings
+          </div>
+        </nav>
 
-        <button id="addDomainBtn">Add Domain</button>
-        <button id="saveBtn">Save Changes</button>
+        <div class="meta">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>
+              <div style="font-weight: 700">Status</div>
+              <div style="font-size: 13px; color: var(--muted)">Ready</div>
+            </div>
+            <div>
+              <button id="exitSidebarBtn" class="small-btn btn-danger">
+                Exit
+              </button>
+            </div>
+          </div>
 
-        <ul id="domainList"></ul>
-      </div>
+          <div style="margin-top: 12px; font-size: 13px; color: var(--muted)">
+            <div>
+              Whitelist file:
+              <code style="color: #9fb7ff">config/whitelist.json</code>
+            </div>
+          </div>
+        </div>
+      </aside>
 
-      <!-- EXIT BUTTON ONLY -->
-      <div class="card">
-        <button id="exitBtn" class="danger">Exit</button>
-      </div>
+      <!-- MAIN -->
+      <main class="main">
+        <div class="topbar card">
+          <div>
+            <div class="title">Admin Dashboard</div>
+            <div class="sub">Manage whitelist, controls, and view logs</div>
+          </div>
+
+          <div style="display: flex; gap: 12px; align-items: center">
+            <div style="font-size: 13px; color: var(--muted)">
+              User: <strong>admin01</strong>
+            </div>
+            <div style="font-size: 13px; color: var(--muted)">
+              Mode: <strong>Admin</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="content">
+          <!-- WHITELIST CARD -->
+          <section id="tab-whitelist" class="card">
+            <div class="whitelist-header">
+              <div style="display: flex; flex-direction: column">
+                <div style="font-size: 18px; font-weight: 700">
+                  Allowed Domains
+                </div>
+                <div style="font-size: 13px; color: var(--muted)">
+                  Domains must be root domains (example.com)
+                </div>
+              </div>
+
+              <div style="margin-top: 12px; width: 100%">
+                <input
+                  id="newDomainInput"
+                  type="text"
+                  placeholder="Add domain (example.com)"
+                  style="
+                    width: 100%;
+                    padding: 12px;
+                    margin-bottom: 12px;
+                    font-size: 15px;
+                  "
+                />
+
+                <div style="display: flex; gap: 10px">
+                  <button
+                    id="addDomainBtn"
+                    class="small-btn btn-primary"
+                    style="flex: 1"
+                  >
+                    Add Domain
+                  </button>
+
+                  <button
+                    id="saveWhitelistBtn"
+                    class="small-btn btn-primary"
+                    style="flex: 1"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <ul id="domainList" class="domain-list"></ul>
+          </section>
+
+          <!-- CONTROLS -->
+          <section id="tab-controls" class="card" style="display: none">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+              "
+            >
+              <div>
+                <div style="font-size: 18px; font-weight: 700">Controls</div>
+                <div style="font-size: 13px; color: var(--muted)">
+                  Quick actions for the BrowserView
+                </div>
+              </div>
+            </div>
+
+            <div class="controls-grid">
+              <input
+                id="openUrlInput"
+                class="input"
+                type="text"
+                placeholder="Type URL or search (e.g. google or example.com)"
+              />
+              <button id="openUrlBtn" class="small-btn btn-primary">
+                Open
+              </button>
+
+              <button id="backBtn" class="small-btn btn-ghost">◀ Back</button>
+              <button id="forwardBtn" class="small-btn btn-ghost">
+                ▶ Forward
+              </button>
+              <button id="reloadBtn" class="small-btn btn-ghost">
+                ⟳ Reload
+              </button>
+            </div>
+
+            <div style="margin-top: 18px; color: var(--muted); font-size: 13px">
+              <strong>Note:</strong> Users will be restricted by the whitelist.
+              Admin can open any URL.
+            </div>
+          </section>
+
+          <!-- LOGS -->
+          <section id="tab-logs" class="card" style="display: none">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+              "
+            >
+              <div>
+                <div style="font-size: 18px; font-weight: 700">
+                  Activity Logs
+                </div>
+                <div style="font-size: 13px; color: var(--muted)">
+                  Blocked / Allowed / Actions
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px">
+                <button id="reloadLogsBtn" class="small-btn btn-ghost">
+                  Reload
+                </button>
+                <button id="downloadLogsBtn" class="small-btn btn-primary">
+                  Download
+                </button>
+              </div>
+            </div>
+
+            <div id="logsArea" class="log-area">Loading logs...</div>
+          </section>
+
+          <!-- SETTINGS -->
+          <section id="tab-settings" class="card" style="display: none">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+              "
+            >
+              <div>
+                <div style="font-size: 18px; font-weight: 700">Settings</div>
+                <div style="font-size: 13px; color: var(--muted)">
+                  Basic configuration (UI only)
+                </div>
+              </div>
+              <div style="color: var(--muted); font-size: 13px">v1.0</div>
+            </div>
+
+            <div class="setting-row">
+              <div>Allow search for users</div>
+              <div><input id="allowSearchToggle" type="checkbox" /></div>
+            </div>
+
+            <div class="setting-row">
+              <div>Enable camera monitoring</div>
+              <div><input id="cameraToggle" type="checkbox" /></div>
+            </div>
+
+            <div
+              style="margin-top: 12px; display: flex; justify-content: flex-end"
+            >
+              <button id="saveSettingsBtn" class="small-btn btn-primary">
+                Save Settings
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
 
     <script>
-      const listEl = document.getElementById("domainList");
-      const inputEl = document.getElementById("newDomain");
+      // Basic tab navigation
+      const tabs = {
+        whitelist: document.getElementById("tab-whitelist"),
+        controls: document.getElementById("tab-controls"),
+        logs: document.getElementById("tab-logs"),
+        settings: document.getElementById("tab-settings"),
+      };
 
-      const addBtn = document.getElementById("addDomainBtn");
-      const saveBtn = document.getElementById("saveBtn");
-      const exitBtn = document.getElementById("exitBtn");
+      document.querySelectorAll(".nav-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          document
+            .querySelectorAll(".nav-item")
+            .forEach((n) => n.classList.remove("active"));
+          el.classList.add("active");
+          const tab = el.getAttribute("data-tab");
+          Object.keys(tabs).forEach((k) => {
+            tabs[k].style.display = k === tab ? "block" : "none";
+          });
+        });
+      });
+
+      // --- Whitelist logic ---
+      const domainListEl = document.getElementById("domainList");
+      const newDomainInput = document.getElementById("newDomainInput");
+      const addDomainBtn = document.getElementById("addDomainBtn");
+      const saveWhitelistBtn = document.getElementById("saveWhitelistBtn");
 
       let whitelist = [];
 
-      // Load whitelist.json
       async function loadWhitelist() {
         try {
-          const res = await fetch("../../config/whitelist.json");
-          whitelist = await res.json();
-          renderList();
+          whitelist = await window.secureAPI.readWhitelist();
+          renderWhitelist();
         } catch (e) {
-          console.error("Failed to load whitelist", e);
+          console.warn("Could not load whitelist.json", e);
+          whitelist = [];
         }
+        renderWhitelist();
       }
 
-      function renderList() {
-        listEl.innerHTML = "";
-        whitelist.forEach((domain, index) => {
+      function renderWhitelist() {
+        domainListEl.innerHTML = "";
+        whitelist.forEach((d, i) => {
           const li = document.createElement("li");
-          li.textContent = domain;
-
-          const btn = document.createElement("button");
-          btn.className = "remove-btn";
-          btn.textContent = "Remove";
-
-          btn.onclick = () => {
-            whitelist.splice(index, 1);
-            renderList();
+          li.textContent = d;
+          const removeBtn = document.createElement("button");
+          removeBtn.textContent = "Remove";
+          removeBtn.className = "remove-btn small-btn btn-danger";
+          removeBtn.style.padding = "6px 10px";
+          removeBtn.onclick = () => {
+            whitelist.splice(i, 1);
+            renderWhitelist();
           };
-
-          li.appendChild(btn);
-          listEl.appendChild(li);
+          li.appendChild(removeBtn);
+          domainListEl.appendChild(li);
         });
       }
 
-      addBtn.onclick = () => {
-        const domain = inputEl.value.trim();
-        if (!domain) return;
-
-        whitelist.push(domain);
-        inputEl.value = "";
-        renderList();
+      addDomainBtn.onclick = () => {
+        const v = (newDomainInput.value || "").trim().toLowerCase();
+        if (!v) return;
+        // normalize domain (strip protocol, path)
+        const cleaned = v
+          .replace(/^https?:\/\//, "")
+          .replace(/^www\./, "")
+          .split("/")[0];
+        if (!cleaned) return;
+        if (whitelist.includes(cleaned)) {
+          newDomainInput.value = "";
+          return;
+        }
+        whitelist.push(cleaned);
+        newDomainInput.value = "";
+        renderWhitelist();
       };
 
-      saveBtn.onclick = async () => {
+      saveWhitelistBtn.onclick = async () => {
         const ok = await window.secureAPI.adminUpdateWhitelist(whitelist);
-        if (ok) alert("Whitelist saved!");
-        else alert("Failed to save whitelist.");
+        if (ok) alert("Whitelist saved");
+        else alert("Failed to save whitelist");
       };
 
-      exitBtn.onclick = () => {
+      // --- Controls logic ---
+      const openUrlInput = document.getElementById("openUrlInput");
+      document.getElementById("openUrlBtn").onclick = () => {
+        const v = (openUrlInput.value || "").trim();
+        if (!v) return;
+        window.secureAPI.loadURL(v);
+      };
+      document.getElementById("backBtn").onclick = () =>
+        window.secureAPI.navControl("back");
+      document.getElementById("forwardBtn").onclick = () =>
+        window.secureAPI.navControl("forward");
+      document.getElementById("reloadBtn").onclick = () =>
+        window.secureAPI.navControl("reload");
+
+      // --- Logs logic ---
+      const logsArea = document.getElementById("logsArea");
+      const reloadLogsBtn = document.getElementById("reloadLogsBtn");
+      const downloadLogsBtn = document.getElementById("downloadLogsBtn");
+
+      async function loadLogs() {
+        logsArea.textContent = "Loading logs...";
+        try {
+          const res = await fetch("../../logs/activity.log");
+          if (!res.ok) throw new Error("no logs");
+          const txt = await res.text();
+          logsArea.textContent = txt || "No log entries";
+        } catch (e) {
+          logsArea.textContent = "No logs available";
+        }
+      }
+
+      reloadLogsBtn.onclick = loadLogs;
+
+      downloadLogsBtn.onclick = async () => {
+        try {
+          const res = await fetch("../../logs/activity.log");
+          if (!res.ok) throw new Error("no logs");
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "activity.log";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        } catch (e) {
+          alert("No logs to download");
+        }
+      };
+
+      // --- Settings (placeholder persistence via adminUpdateWhitelist hack) ---
+      const allowSearchToggle = document.getElementById("allowSearchToggle");
+      const cameraToggle = document.getElementById("cameraToggle");
+      document.getElementById("saveSettingsBtn").onclick = async () => {
+        // simple persistence: write a small settings file via adminUpdateWhitelist by piggybacking (if you add a dedicated API later, replace)
+        const settings = {
+          allowSearch: allowSearchToggle.checked,
+          cameraEnabled: cameraToggle.checked,
+        };
+        // store in whitelist.json as a hack? no — better to alert for now and implement proper IPC later
+        alert(
+          "Settings saved (temporarily only in UI). To persist settings, we can add a dedicated IPC handler."
+        );
+      };
+
+      // --- exit button ---
+      document.getElementById("exitSidebarBtn").onclick = () =>
         window.secureAPI.emergencyExit();
-      };
 
+      // initial load
       loadWhitelist();
+      loadLogs();
+
+      // small enhancement: keyboard Enter on add domain
+      newDomainInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") addDomainBtn.click();
+      });
     </script>
   </body>
 </html>

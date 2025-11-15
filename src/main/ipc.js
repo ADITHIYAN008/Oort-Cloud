@@ -85,6 +85,18 @@ function init({ mainWindow, view }) {
       return false;
     }
   });
+  ipcMain.handle("admin-read-whitelist", async () => {
+    const fs = require("fs");
+    const path = require("path");
+    const file = path.join(__dirname, "../../config/whitelist.json");
+
+    try {
+      return JSON.parse(fs.readFileSync(file, "utf8"));
+    } catch (e) {
+      console.error("Failed to read whitelist.json", e);
+      return [];
+    }
+  });
 
   // Auth login: attach BrowserView and attachToSession after success
   ipcMain.handle("auth-login", async (event, { userid, password }) => {
