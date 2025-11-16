@@ -2,12 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Admin • Secure One-Tab</title>
+    <title>Admin • Oort Cloud</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
-      /* ---------------------------
-     Vision-like Glass UI — Preset A (Brighter & Visible)
-     --------------------------- */
       :root {
         --bg-900: #000000;
         --panel-900: rgba(255, 255, 255, 0.06);
@@ -37,7 +34,6 @@
           "Helvetica Neue", Arial;
       }
 
-      /* APP LAYOUT */
       .app {
         display: flex;
         gap: 24px;
@@ -45,7 +41,6 @@
         padding: 24px;
       }
 
-      /* SIDEBAR */
       .sidebar {
         width: 260px;
         border-radius: var(--radius);
@@ -90,7 +85,6 @@
         color: var(--muted);
       }
 
-      /* NAVIGATION */
       nav {
         display: flex;
         flex-direction: column;
@@ -118,7 +112,6 @@
         box-shadow: 0 6px 25px rgba(74, 138, 244, 0.18);
       }
 
-      /* SIDEBAR FOOTER */
       .meta {
         margin-top: auto;
         border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -127,7 +120,6 @@
         font-size: 13px;
       }
 
-      /* BUTTONS */
       button {
         cursor: pointer;
         border-radius: 10px;
@@ -164,7 +156,6 @@
         font-size: 15px;
       }
 
-      /* MAIN AREA */
       .main {
         flex: 1;
         display: flex;
@@ -193,7 +184,6 @@
         font-size: 13px;
       }
 
-      /* CARDS */
       .card {
         background: rgba(255, 255, 255, 0.05);
         border-radius: var(--radius);
@@ -204,7 +194,6 @@
         margin-bottom: 20px;
       }
 
-      /* INPUTS */
       input[type="text"] {
         width: 100%;
         padding: 14px 16px;
@@ -221,7 +210,6 @@
         outline: none;
       }
 
-      /* DOMAIN LIST */
       .domain-list {
         list-style: none;
         margin-top: 14px;
@@ -241,7 +229,6 @@
         color: white;
       }
 
-      /* LOG AREA */
       .log-area {
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -258,12 +245,11 @@
 
   <body>
     <div class="app">
-      <!-- SIDEBAR -->
       <aside class="sidebar">
         <div class="brand">
-          <div class="logo">S</div>
+          <div class="logo">O</div>
           <div>
-            <div class="title">Secure One-Tab</div>
+            <div class="title">Oort Cloud</div>
             <div class="sub">Admin Console</div>
           </div>
         </div>
@@ -275,7 +261,7 @@
         </nav>
 
         <div class="meta">
-          <div>Status: Ready</div>
+          <div>Status: Ready 🟢</div>
           <div style="margin-top: 6px; font-size: 12px">
             File:
             <span style="color: #9fb7ff">config/whitelist.json</span>
@@ -291,7 +277,6 @@
         </div>
       </aside>
 
-      <!-- MAIN -->
       <main class="main">
         <header class="topbar">
           <div>
@@ -308,7 +293,6 @@
         </header>
 
         <section class="content">
-          <!-- WHITELIST -->
           <div id="tab-whitelist" class="card">
             <h2>Allowed Domains</h2>
             <p style="color: var(--muted); margin-top: -6px">
@@ -328,7 +312,6 @@
             <ul id="domainList" class="domain-list"></ul>
           </div>
 
-          <!-- LOGS -->
           <div id="tab-logs" class="card" style="display: none">
             <h2>Activity Logs</h2>
             <div style="margin-bottom: 12px">
@@ -340,7 +323,6 @@
             <div id="logsArea" class="log-area">Loading logs…</div>
           </div>
 
-          <!-- SETTINGS -->
           <div id="tab-settings" class="card" style="display: none">
             <h2>Settings</h2>
 
@@ -367,7 +349,6 @@
     </div>
 
     <script>
-      /* TAB NAVIGATION (unchanged) */
       const tabs = {
         whitelist: document.getElementById("tab-whitelist"),
         logs: document.getElementById("tab-logs"),
@@ -388,10 +369,8 @@
         });
       });
 
-      /* EXIT */
       exitSidebarBtn.onclick = () => window.secureAPI.emergencyExit();
 
-      /* WHITELIST (unchanged) */
       let whitelist = [];
       const domainListEl = document.getElementById("domainList");
 
@@ -444,13 +423,6 @@
         flash("Whitelist saved");
       };
 
-      /* -------------------------
-     USERS & ACTIVITY (new)
-     - adminListUsers -> show table
-     - adminUpdateUser -> toggle locked/enabled
-     - logs read from ../../logs/activity.log
-     ------------------------- */
-
       const usersContainer = document.createElement("div");
       usersContainer.style.marginTop = "12px";
       usersContainer.className = "card";
@@ -460,7 +432,6 @@
     <p style="color: var(--muted)">Manage user status and view last login.</p>
     <div id="usersTableWrap"></div>
   `;
-      // Insert users block above logs card
       const contentEl = document.querySelector(".content");
       contentEl.insertBefore(
         usersContainer,
@@ -556,7 +527,6 @@
         wrap.appendChild(table);
       }
 
-      /* LOGS (unchanged reading mechanism) */
       async function loadLogs() {
         try {
           const r = await fetch("../../logs/activity.log");
@@ -584,10 +554,8 @@
         }
       };
 
-      /* SETTINGS (unchanged) */
       saveSettingsBtn.onclick = () => flash("Settings saved (UI only)");
 
-      /* FLASH */
       function flash(msg, isError) {
         const el = document.createElement("div");
         el.textContent = msg;
@@ -610,7 +578,6 @@
         setTimeout(() => el.remove(), 1900);
       }
 
-      /* INIT */
       loadWhitelist();
       loadLogs();
       loadUsers();

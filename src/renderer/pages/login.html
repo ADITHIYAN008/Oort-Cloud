@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Secure Login</title>
+    <title>Oort Cloud</title>
     <style>
       body {
         margin: 0;
@@ -14,7 +14,6 @@
         overflow: hidden;
       }
 
-      /* Subtle background gradient */
       .bg-gradient {
         position: absolute;
         width: 100%;
@@ -55,7 +54,7 @@
       input,
       button {
         width: 100%;
-        box-sizing: border-box; /* ⭐ ensures perfect same width */
+        box-sizing: border-box;
       }
       input {
         padding: 14px;
@@ -114,7 +113,7 @@
     <div class="bg-gradient"></div>
 
     <div class="card">
-      <h2>Secure Access</h2>
+      <h2>Oort Cloud</h2>
 
       <input id="userid" placeholder="User ID" autocomplete="off" />
       <input id="password" type="password" placeholder="Password" />
@@ -140,7 +139,6 @@
           return;
         }
 
-        // Redirect
         if (result.role === "admin") {
           window.location.replace("admin.html");
         } else {

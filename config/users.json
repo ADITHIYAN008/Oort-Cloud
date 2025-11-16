@@ -5,7 +5,8 @@
     "password": "1234",
     "enabled": true,
     "locked": false,
-    "lastLogin": "2025-11-16T14:00:09.825Z"
+    "lastLogin": "2025-11-16T16:23:01.064Z",
+    "lastExit": "2025-11-16T16:18:44.546Z"
   },
   {
     "id": "user02",
@@ -13,8 +14,8 @@
     "password": "abcd",
     "enabled": true,
     "locked": false,
-    "lastLogin": "2025-11-16T14:51:14.876Z",
-    "lastExit": "2025-11-16T14:51:20.438Z"
+    "lastLogin": "2025-11-16T16:26:03.770Z",
+    "lastExit": "2025-11-16T16:26:07.657Z"
   },
   {
     "id": "admin01",
@@ -23,6 +24,6 @@
     "enabled": true,
     "locked": false,
     "role": "admin",
-    "lastLogin": "2025-11-16T15:16:41.269Z"
+    "lastLogin": "2025-11-16T16:26:18.770Z"
   }
 ]

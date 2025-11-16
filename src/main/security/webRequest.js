@@ -72,13 +72,10 @@ function attachToSession(sess) {
       showBlockedPage(details, cleanHost);
       return callback({ cancel: true });
     }
-
-    // allow same-origin subresources for currentRoot
     if (currentRoot && root === currentRoot) {
       return callback({ cancel: false });
     }
 
-    // otherwise block
     return callback({ cancel: true });
   });
 }

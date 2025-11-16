@@ -1,4 +1,3 @@
-// src/main/ipc.js
 const { ipcMain, webContents } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -6,7 +5,6 @@ const fs = require("fs");
 let _mainWindow = null;
 let _view = null;
 
-// config files
 const USERS_FILE = path.join(__dirname, "../../config/users.json");
 const WHITELIST_FILE = path.join(__dirname, "../../config/whitelist.json");
 const LOG_FILE = path.join(__dirname, "../../logs/activity.log");
@@ -40,7 +38,6 @@ function appendLogLine(line) {
   }
 }
 
-// Helpers for users
 function readUsers() {
   return safeReadJSON(USERS_FILE, []);
 }
@@ -56,7 +53,6 @@ function init({ mainWindow, view }) {
   _mainWindow = mainWindow;
   _view = view;
 
-  // Load URL (supports search fallback)
   ipcMain.on("load-url", (event, url) => {
     if (!_view) return;
     try {
@@ -80,7 +76,6 @@ function init({ mainWindow, view }) {
     }
   });
 
-  // Offline / Online handlers
   ipcMain.on("go-offline", () => {
     if (_view) {
       _view.webContents.loadFile(
@@ -97,7 +92,6 @@ function init({ mainWindow, view }) {
     }
   });
 
-  // Navigation
   ipcMain.on("nav-control", (event, action) => {
     if (!_view) return;
     switch (action) {
@@ -113,7 +107,6 @@ function init({ mainWindow, view }) {
     }
   });
 
-  // Emergency exit (admin quick exit of whole app)
   ipcMain.on("emergency-exit", () => {
     try {
       appendLogLine("SYSTEM_EMERGENCY_EXIT_BY_ADMIN");
@@ -122,7 +115,6 @@ function init({ mainWindow, view }) {
     process.exit(0);
   });
 
-  // admin whitelist handlers (same as before)
   ipcMain.handle("admin-update-whitelist", async (event, newList) => {
     try {
       fs.writeFileSync(
@@ -141,20 +133,10 @@ function init({ mainWindow, view }) {
     return loadWhitelist();
   });
 
-  /* -------------------------
-     Users & auth
-     - read/write users.json
-     - auth-login uses users.json
-     - maintain global.currentUser on success
-     - admin APIs to list/update users
-     - user-emergency-exit: lock user and log
-     ------------------------- */
-
   ipcMain.handle("admin-list-users", async () => {
     return readUsers();
   });
 
-  // update a single user object (by id). Partial updates allowed.
   ipcMain.handle("admin-update-user", async (event, { id, updates }) => {
     try {
       const users = readUsers();
@@ -174,12 +156,10 @@ function init({ mainWindow, view }) {
     return readUsers();
   });
 
-  // expose current logged-in user id (string) or null
   ipcMain.handle("get-current-user", async () => {
     return global.currentUser || null;
   });
 
-  // user emergency exit: lock this user and log. Accept optional id, else use global.currentUser
   ipcMain.handle("user-emergency-exit", async (event, maybeId) => {
     try {
       const id = maybeId || global.currentUser;
@@ -193,20 +173,17 @@ function init({ mainWindow, view }) {
       if (idx === -1) return { ok: false, error: "not-found" };
 
       users[idx].locked = true;
-      users[idx].enabled = false; // also disable to be safe
+      users[idx].enabled = false;
       users[idx].lastExit = new Date().toISOString();
       writeUsers(users);
 
       appendLogLine(`USER_EMERGENCY_EXIT ${id} locked=true`);
 
-      // Optionally: force close main window / session for kiosk
       try {
         if (_mainWindow) _mainWindow.destroy();
       } catch {}
 
       process.exit(0);
-      // never reached
-      // return after exit in case of testing
       return { ok: true };
     } catch (e) {
       console.error("user-emergency-exit failed:", e);
@@ -214,7 +191,6 @@ function init({ mainWindow, view }) {
     }
   });
 
-  // Auth login: use config users
   ipcMain.handle("auth-login", async (event, { userid, password }) => {
     try {
       const users = readUsers();
@@ -226,7 +202,6 @@ function init({ mainWindow, view }) {
         return { success: false, reason: "invalid" };
       }
 
-      // blocked or disabled
       if (found.locked) {
         appendLogLine(`LOGIN_REFUSED ${userid} (locked)`);
         return { success: false, reason: "locked" };
@@ -236,7 +211,6 @@ function init({ mainWindow, view }) {
         return { success: false, reason: "disabled" };
       }
 
-      // success: update lastLogin
       const now = new Date().toISOString();
       const idx = users.findIndex((u) => u.id === userid);
       if (idx !== -1) {
@@ -244,14 +218,11 @@ function init({ mainWindow, view }) {
         writeUsers(users);
       }
 
-      // set global current user for this kiosk instance
       global.currentUser = userid;
       global.currentUserRole = found.role || "user";
 
       appendLogLine(`LOGIN_SUCCESS ${userid} role=${global.currentUserRole}`);
 
-      // attach view and session filter (caller expects role)
-      // Attach BrowserView only for normal users, NOT admin
       if (found.role !== "admin") {
         if (_mainWindow && _view) {
           _mainWindow.setBrowserView(_view);
@@ -279,13 +250,11 @@ function init({ mainWindow, view }) {
           }
         }
       } else {
-        // ADMIN MODE — REMOVE BrowserView if already attached
         try {
           _mainWindow.setBrowserView(null);
         } catch {}
       }
 
-      // return success + role + id so front-end can store
       return { success: true, role: found.role || "user", id: found.id };
     } catch (e) {
       console.error("auth-login error:", e);
