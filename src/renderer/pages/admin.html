@@ -457,13 +457,14 @@
         table.innerHTML = `
       <thead style="text-align:left">
         <tr>
-          <th style="padding:8px 6px">ID</th>
-          <th>Name</th>
-          <th>Password</th>
-          <th>Enabled</th>
-          <th>Locked</th>
-          <th>Last Login</th>
-          <th>Actions</th>
+        <th style="padding:8px 6px">ID</th>
+        <th>Name</th>
+        <th>Password</th>
+        <th>Enabled</th>
+        <th>Locked</th>
+        <th>Last Login</th>
+        <th>Last Exit</th>
+        <th>Batch</th>
         </tr>
       </thead>
     `;
@@ -472,14 +473,17 @@
           const tr = document.createElement("tr");
           tr.style.borderTop = "1px solid rgba(255,255,255,0.03)";
           tr.innerHTML = `
-        <td style="padding:10px 6px">${u.id}</td>
-        <td>${u.name || ""}</td>
-        <td>${u.password || ""}</td>
-        <td style="text-align:center">${u.enabled ? "✅" : "❌"}</td>
-        <td style="text-align:center">${u.locked ? "🔒" : "🔓"}</td>
-        <td>${u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "-"}</td>
-        <td style="text-align:right"></td>
-      `;
+  <td style="padding:10px 6px">${u.id}</td>
+  <td>${u.name || ""}</td>
+  <td>${u.password || ""}</td>
+  <td style="text-align:center">${u.enabled ? "✅" : "❌"}</td>
+  <td style="text-align:center">${u.locked ? "🔒" : "🔓"}</td>
+  <td>${u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "-"}</td>
+  <td>${u.lastExit ? new Date(u.lastExit).toLocaleString() : "-"}</td>
+  <td style="text-align:center">${u.batch || "-"}</td>
+  <td style="text-align:right"></td>
+`;
+
           const actionsTd = tr.querySelector("td:last-child");
 
           const toggleLockBtn = document.createElement("button");

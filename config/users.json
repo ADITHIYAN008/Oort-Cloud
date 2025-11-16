@@ -3,15 +3,27 @@
     "id": "user01",
     "name": "Adithiyan R",
     "password": "1234",
-    "enabled": true,
-    "locked": false,
-    "lastLogin": "2025-11-16T16:23:01.064Z",
-    "lastExit": "2025-11-16T16:18:44.546Z"
+    "batch": "A3",
+    "enabled": false,
+    "locked": true,
+    "lastLogin": "2025-11-16T16:56:00.923Z",
+    "lastExit": "2025-11-16T16:56:14.717Z"
   },
   {
     "id": "user02",
-    "name": "Justin Bieber",
-    "password": "abcd",
+    "name": "Kishore",
+    "password": "1111",
+    "batch": "A3",
+    "enabled": true,
+    "locked": false,
+    "lastLogin": "2025-11-16T16:26:03.770Z",
+    "lastExit": "2025-11-16T16:26:07.657Z"
+  },
+  {
+    "id": "user03",
+    "name": "Karthikeyan",
+    "password": "2222",
+    "batch": "A3",
     "enabled": true,
     "locked": false,
     "lastLogin": "2025-11-16T16:26:03.770Z",
@@ -21,9 +33,10 @@
     "id": "admin01",
     "name": "Logesh R",
     "password": "admin123",
+    "batch": "A3 TA",
     "enabled": true,
     "locked": false,
     "role": "admin",
-    "lastLogin": "2025-11-16T16:26:18.770Z"
+    "lastLogin": "2025-11-16T16:55:15.507Z"
   }
 ]
