@@ -1,3 +1,4 @@
+// src/renderer/renderer.js
 window.addEventListener("DOMContentLoaded", () => {
   const urlInput = document.getElementById("url");
   const goBtn = document.getElementById("go");
@@ -23,8 +24,24 @@ window.addEventListener("DOMContentLoaded", () => {
     window.secureAPI.navControl("reload")
   );
 
-  emergencyBtn.addEventListener("click", () => {
-    if (confirm("Exit the kiosk?")) window.secureAPI.emergencyExit();
+  emergencyBtn.addEventListener("click", async () => {
+    // When a user hits emergency exit we lock that user and quit the app.
+    // Retrieve current user id (if available)
+    const userId = await window.secureAPI.getCurrentUser();
+    const ok = confirm(
+      "Emergency exit will lock your account and quit the app. Continue?"
+    );
+    if (!ok) return;
+
+    // request main to mark emergency exit for this user
+    try {
+      await window.secureAPI.userEmergencyExit(userId);
+      // main will exit the process; if not, fallback:
+      setTimeout(() => window.close(), 200);
+    } catch (e) {
+      console.error("userEmergencyExit failed", e);
+      alert("Failed to perform emergency exit.");
+    }
   });
 
   adminBtn.addEventListener("click", async () => {

@@ -367,7 +367,7 @@
     </div>
 
     <script>
-      /* TAB NAVIGATION */
+      /* TAB NAVIGATION (unchanged) */
       const tabs = {
         whitelist: document.getElementById("tab-whitelist"),
         logs: document.getElementById("tab-logs"),
@@ -391,7 +391,7 @@
       /* EXIT */
       exitSidebarBtn.onclick = () => window.secureAPI.emergencyExit();
 
-      /* WHITELIST */
+      /* WHITELIST (unchanged) */
       let whitelist = [];
       const domainListEl = document.getElementById("domainList");
 
@@ -410,9 +410,9 @@
           const li = document.createElement("li");
           li.className = "domain-item";
           li.innerHTML = `
-            <span>${domain}</span>
-            <button class="btn-ghost" style="padding:10px 14px">Remove</button>
-          `;
+        <span>${domain}</span>
+        <button class="btn-ghost" style="padding:10px 14px">Remove</button>
+      `;
           li.querySelector("button").onclick = () => {
             whitelist.splice(index, 1);
             renderWhitelist();
@@ -444,7 +444,119 @@
         flash("Whitelist saved");
       };
 
-      /* LOGS */
+      /* -------------------------
+     USERS & ACTIVITY (new)
+     - adminListUsers -> show table
+     - adminUpdateUser -> toggle locked/enabled
+     - logs read from ../../logs/activity.log
+     ------------------------- */
+
+      const usersContainer = document.createElement("div");
+      usersContainer.style.marginTop = "12px";
+      usersContainer.className = "card";
+      usersContainer.style.padding = "12px";
+      usersContainer.innerHTML = `
+    <h2>Users</h2>
+    <p style="color: var(--muted)">Manage user status and view last login.</p>
+    <div id="usersTableWrap"></div>
+  `;
+      // Insert users block above logs card
+      const contentEl = document.querySelector(".content");
+      contentEl.insertBefore(
+        usersContainer,
+        document.getElementById("tab-logs")
+      );
+
+      async function loadUsers() {
+        try {
+          const users = await window.secureAPI.adminListUsers();
+          renderUsers(users || []);
+        } catch (e) {
+          console.warn("loadUsers failed", e);
+          renderUsers([]);
+        }
+      }
+
+      function renderUsers(users) {
+        const wrap = document.getElementById("usersTableWrap");
+        wrap.innerHTML = "";
+        const table = document.createElement("table");
+        table.style.width = "100%";
+        table.style.borderCollapse = "collapse";
+        table.innerHTML = `
+      <thead style="text-align:left">
+        <tr>
+          <th style="padding:8px 6px">ID</th>
+          <th>Name</th>
+          <th>Password</th>
+          <th>Enabled</th>
+          <th>Locked</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+    `;
+        const tbody = document.createElement("tbody");
+        users.forEach((u) => {
+          const tr = document.createElement("tr");
+          tr.style.borderTop = "1px solid rgba(255,255,255,0.03)";
+          tr.innerHTML = `
+        <td style="padding:10px 6px">${u.id}</td>
+        <td>${u.name || ""}</td>
+        <td>${u.password || ""}</td>
+        <td style="text-align:center">${u.enabled ? "✅" : "❌"}</td>
+        <td style="text-align:center">${u.locked ? "🔒" : "🔓"}</td>
+        <td>${u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "-"}</td>
+        <td style="text-align:right"></td>
+      `;
+          const actionsTd = tr.querySelector("td:last-child");
+
+          const toggleLockBtn = document.createElement("button");
+          toggleLockBtn.className = "btn-ghost";
+          toggleLockBtn.style.marginRight = "8px";
+          toggleLockBtn.textContent = u.locked ? "Unlock" : "Lock";
+          toggleLockBtn.onclick = async () => {
+            const updates = { locked: !u.locked };
+            const resp = await window.secureAPI.adminUpdateUser({
+              id: u.id,
+              updates,
+            });
+            if (resp && resp.ok) {
+              flash(`${u.id} ${updates.locked ? "locked" : "unlocked"}`);
+              loadUsers();
+            } else {
+              flash("Failed to update user", true);
+            }
+          };
+
+          const toggleEnableBtn = document.createElement("button");
+          toggleEnableBtn.className = "btn-primary";
+          toggleEnableBtn.style.marginRight = "8px";
+          toggleEnableBtn.textContent = u.enabled ? "Disable" : "Enable";
+          toggleEnableBtn.onclick = async () => {
+            const updates = { enabled: !u.enabled };
+            const resp = await window.secureAPI.adminUpdateUser({
+              id: u.id,
+              updates,
+            });
+            if (resp && resp.ok) {
+              flash(`${u.id} ${updates.enabled ? "enabled" : "disabled"}`);
+              loadUsers();
+            } else {
+              flash("Failed to update user", true);
+            }
+          };
+
+          actionsTd.appendChild(toggleEnableBtn);
+          actionsTd.appendChild(toggleLockBtn);
+
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        wrap.appendChild(table);
+      }
+
+      /* LOGS (unchanged reading mechanism) */
       async function loadLogs() {
         try {
           const r = await fetch("../../logs/activity.log");
@@ -472,11 +584,11 @@
         }
       };
 
-      /* SETTINGS */
+      /* SETTINGS (unchanged) */
       saveSettingsBtn.onclick = () => flash("Settings saved (UI only)");
 
-      /* FLASH MESSAGE */
-      function flash(msg) {
+      /* FLASH */
+      function flash(msg, isError) {
         const el = document.createElement("div");
         el.textContent = msg;
         el.style.position = "fixed";
@@ -484,7 +596,9 @@
         el.style.left = "50%";
         el.style.transform = "translateX(-50%)";
         el.style.padding = "12px 20px";
-        el.style.background = "rgba(74,138,244,0.18)";
+        el.style.background = isError
+          ? "rgba(255,90,90,0.18)"
+          : "rgba(74,138,244,0.18)";
         el.style.border = "1px solid rgba(255,255,255,0.2)";
         el.style.color = "white";
         el.style.borderRadius = "10px";
@@ -499,6 +613,7 @@
       /* INIT */
       loadWhitelist();
       loadLogs();
+      loadUsers();
     </script>
   </body>
 </html>

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "user01",
+    "name": "Adithiyan R",
+    "password": "1234",
+    "enabled": true,
+    "locked": false,
+    "lastLogin": "2025-11-16T14:00:09.825Z"
+  },
+  {
+    "id": "user02",
+    "name": "Justin Bieber",
+    "password": "abcd",
+    "enabled": true,
+    "locked": false,
+    "lastLogin": "2025-11-16T14:51:14.876Z",
+    "lastExit": "2025-11-16T14:51:20.438Z"
+  },
+  {
+    "id": "admin01",
+    "name": "Logesh R",
+    "password": "admin123",
+    "enabled": true,
+    "locked": false,
+    "role": "admin",
+    "lastLogin": "2025-11-16T15:16:41.269Z"
+  }
+]
